@@ -85,6 +85,6 @@ if __name__=="__main__":
     if "PORT" in os.environ:
         args.port = os.environ["PORT"]
     else:
-        args.port = 80
-        
+        args.port = "80"
+
     run_washer(args.port, args)
