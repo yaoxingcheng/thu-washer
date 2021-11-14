@@ -25,7 +25,7 @@ def get_results(tower, device):
     r = requests.post("https://api.cleverschool.cn/washapi4/device/status", headers=header, data=payload)
     return json.loads(r.text)
 
-def run_simcse_demo(port, args):
+def run_washer(port, args):
     app = Flask(__name__, static_folder='./static')
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
     CORS(app)
@@ -83,4 +83,4 @@ if __name__=="__main__":
     parser.add_argument('--ip', default='http://127.0.0.1')
     args = parser.parse_args()
 
-    run_simcse_demo(args.port, args)
+    run_washer(args.port, args)
