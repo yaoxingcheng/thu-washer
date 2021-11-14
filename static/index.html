@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<title>thu-washer</title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="files/style.css">
+
+<script src="files/all.js"></script>
+<script src="files/jquery-3.3.1.min.js"></script>
+<script src="files/popper.min.js"></script>
+<script src="files/bootstrap.min.js"></script>
+
+<body>
+
+<div class="container" id="container">
+    <!-- Default inline 1-->
+
+    <div class="input-group mb-1 mt-4">
+        <div class="input-group-prepend">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">建筑
+            </button>
+            <div class="dropdown-menu" id="tower_options">
+            </div>
+        </div>
+        <input id="tower" type="text" class="form-control" autocomplete="off"
+               autofocus readonly="readonly">
+        <div class="input-group-prepend">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">设备
+            </button>
+            <div class="dropdown-menu" id="device_options">
+            </div>
+        </div>
+        <input id="device" type="text" class="form-control" autocomplete="off"
+               autofocus readonly="readonly">
+        <div class="input-group-append">
+            <button id="search" class="btn btn-secondary" type="button">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <br/>
+
+
+    <div class="card">
+        <ul id="ret-results" class="list-group list-group-flush">
+            <li class="list-group-item"></li>
+        </ul>
+    </div>
+
+</div>
+
+<script>
+    var last_timestamp = new Date().getTime();
+
+    $("#search").click(function () {
+        var tower = $("#tower").val();
+        var device = $("#device").val();
+        var current_timestamp = new Date().getTime();
+        if ((tower.trim().length > 0) && (device.trim().length > 0)) {
+            execute(tower, device);
+        } else {
+            init_result();
+        }
+    });
+
+    function init_result() {
+        $("#ret-time").text("");
+        $("#ret-results").html("<li class=\"list-group-item\"></li>");
+    }
+
+    function execute(tower, device) {
+        var start_time = +new Date();
+        $.get("/api?tower=" + encodeURIComponent(tower) + "&device=" + encodeURIComponent(device), function (out) {
+            var end_time = +new Date();
+            var total_latency = end_time - start_time;
+            $("#ret-time").text(out['ret'].length + " results (" + out['time'] + "ms)");
+            $("#ret-results").empty();
+            result = out['ret']
+            for (var i = 0; i < result.length; i++) {
+                $("#ret-results").append("<li class=\"list-group-item\"><div class=\"row\">"
+                    + "<div class=\"col-2\">" + result[i]["macUnionCode"] + "</div>"
+                    + "<div class=\"col-2\">" + result[i]["floorName"] + "</div>"
+                    + "<div class=\"col-8\">" + result[i]["status"] + "</div>"
+                    + "</div></li>")
+            }
+        });
+    }
+
+    $.getJSON("/get_tower", function (examples) {
+        for (let example of examples) {
+            $('#tower_options').append("<a class=\"dropdown-item\" href=\"#\">" + example + "</a>");
+        }
+    });
+
+    $.getJSON("/get_device", function (examples) {
+        for (let example of examples) {
+            $('#device_options').append("<a class=\"dropdown-item\" href=\"#\">" + example + "</a>");
+        }
+    });
+
+    $("#container").on("click", "#tower_options", function (event) {
+        $('#tower').val($(event.target).text());
+        $('#tower').focus();
+    });
+
+    $("#container").on("click", "#device_options", function (event) {
+        $('#device').val($(event.target).text());
+        $('#device').focus();
+    });
+
+</script>
+
+</body>
+
+</html>
