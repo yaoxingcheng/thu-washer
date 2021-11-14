@@ -82,5 +82,9 @@ if __name__=="__main__":
     parser.add_argument('--port', default='8888', type=str)
     parser.add_argument('--ip', default='http://127.0.0.1')
     args = parser.parse_args()
-
+    if "PORT" in os.environ:
+        args.port = os.environ["PORT"]
+    else:
+        args.port = 80
+        
     run_washer(args.port, args)
